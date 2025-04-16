@@ -347,4 +347,4 @@ jobs:
       pmm_ui_tests_branch: ${{ inputs.pmm_ui_tests_branch || 'v3' }}
       sha: ${{ inputs.sha || github.event.pull_request.head.sha ||  'null' }}
       setup_services: '--database ps'
-      tags_for_tests: '@inventory'
+      tags_for_tests: '@inventory-fb'
