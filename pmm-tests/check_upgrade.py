@@ -86,6 +86,7 @@ class PmmServerComponents(unittest.TestCase):
         self.assertIn(RUNNING, grep_supervisor_status('qan-api2'), NOT_RUNNING_MSG)
 
     def test_clickhouse_status(self):
+        print(f"Upgrade flag is: {os.environ['UPGRADE_FLAG']}")
         self.assertIn(RUNNING, grep_supervisor_status('clickhouse'), NOT_RUNNING_MSG)
 
     def test_grafana_status(self):
