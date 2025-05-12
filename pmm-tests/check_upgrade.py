@@ -86,11 +86,13 @@ class PmmServerComponents(unittest.TestCase):
         self.assertIn(RUNNING, grep_supervisor_status('qan-api2'), NOT_RUNNING_MSG)
 
     def test_clickhouse_status(self):
+        print(verify_command('docker ps -a'))
         print(f"Supervisor status is: {get_supervisor_status()}")
         if os.environ['UPGRADE_FLAG'] == "EXTERNAL-DATA-SOURCES":
             self.assertNotIn('clickhouse', get_supervisor_status(), EXTERNAL_CLICKHOUSE)
         else:
             self.assertIn(RUNNING, grep_supervisor_status('clickhouse'), NOT_RUNNING_MSG)
+
     def test_grafana_status(self):
         self.assertIn(RUNNING, grep_supervisor_status('grafana'), NOT_RUNNING_MSG)
 
