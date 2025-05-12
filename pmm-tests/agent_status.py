@@ -20,16 +20,19 @@ def verify_command(command):
         return subprocess.check_output(command, shell=True, universal_newlines=True, stderr=output).rstrip()
 
 if __name__ == '__main__':
-    print(verify_command("docker ps -a --format '{{.Names}}'"))
+    containerNames = verify_command("docker ps -a --format '{{.Names}}'")
     errors = []
-    listResponse = verify_command("pmm-admin list")
-    for line in listResponse.split("Port")[1].strip().splitlines():
-        if "pmm_agent" in line:
-            if "connected" not in line.lower():
-                errors.append(f"pmm_agent status should be 'Connected' but is: {line}")
-        else:
-            if "running" not in line.lower():
-                errors.append(f"pmm_agent status should be 'Running' but is: {line}")
+
+    for container in containerNames.splitlines():
+        if "ps" in container:
+            listResponse = verify_command(f"docker exec {container} pmm-admin list")
+            for line in listResponse.split("Port")[1].strip().splitlines():
+                if "pmm_agent" in line:
+                    if "connected e" not in line.lower():
+                        errors.append(f"pmm_agent status in container {container} should be 'Connected' but is: {line}")
+                else:
+                    if "running" not in line.lower():
+                        errors.append(f"pmm_agent status in container {container} should be 'Running' but is: {line}")
 
     if errors:
         raise ValueError('\n'.join(errors))
