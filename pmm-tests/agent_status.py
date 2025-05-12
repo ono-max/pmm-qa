@@ -20,6 +20,7 @@ def verify_command(command):
         return subprocess.check_output(command, shell=True, universal_newlines=True, stderr=output).rstrip()
 
 if __name__ == '__main__':
+    print(verify_command("docker ps -a --format '{{.Names}}'"))
     errors = []
     listResponse = verify_command("pmm-admin list")
     for line in listResponse.split("Port")[1].strip().splitlines():
