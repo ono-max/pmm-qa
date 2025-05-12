@@ -10,7 +10,7 @@ WRONG_VERSION_MSG = 'Unexpected version!'
 POST_UPGRADE = 'Post-upgrade test'
 RUNNING = 'RUNNING'
 UPDATE_NOT_REMOVED = 'pmm-update pacakage was not removed!'
-
+EXTERNAL_CLICKHOUSE = 'Internal Clickhouse should not be running, when external clickhouse is selected!'
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -86,9 +86,11 @@ class PmmServerComponents(unittest.TestCase):
         self.assertIn(RUNNING, grep_supervisor_status('qan-api2'), NOT_RUNNING_MSG)
 
     def test_clickhouse_status(self):
-        print(f"Upgrade flag is: {os.environ['UPGRADE_FLAG']}")
-        self.assertIn(RUNNING, grep_supervisor_status('clickhouse'), NOT_RUNNING_MSG)
-
+        print(f"Supervisor status is: {grep_supervisor_status('')}")
+        if os.environ['UPGRADE_FLAG'] == "EXTERNAL-DATA-SOURCES":
+            self.assertNotIn('clickhouse', grep_supervisor_status(''), EXTERNAL_CLICKHOUSE)
+        else:
+            self.assertIn(RUNNING, grep_supervisor_status('clickhouse'), NOT_RUNNING_MSG)
     def test_grafana_status(self):
         self.assertIn(RUNNING, grep_supervisor_status('grafana'), NOT_RUNNING_MSG)
 
