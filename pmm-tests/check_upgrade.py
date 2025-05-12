@@ -86,9 +86,9 @@ class PmmServerComponents(unittest.TestCase):
         self.assertIn(RUNNING, grep_supervisor_status('qan-api2'), NOT_RUNNING_MSG)
 
     def test_clickhouse_status(self):
-        print(f"Supervisor status is: {grep_supervisor_status('')}")
+        print(f"Supervisor status is: {get_supervisor_status()}")
         if os.environ['UPGRADE_FLAG'] == "EXTERNAL-DATA-SOURCES":
-            self.assertNotIn('clickhouse', grep_supervisor_status(''), EXTERNAL_CLICKHOUSE)
+            self.assertNotIn('clickhouse', get_supervisor_status(), EXTERNAL_CLICKHOUSE)
         else:
             self.assertIn(RUNNING, grep_supervisor_status('clickhouse'), NOT_RUNNING_MSG)
     def test_grafana_status(self):
@@ -175,6 +175,13 @@ if __name__ == '__main__':
             return verify_command(f"sudo supervisorctl status | grep {name}")
         else:
             return verify_command(f"docker exec {pmm_server_docker_container} supervisorctl status | grep {name}")
+
+    def get_supervisor_status():
+        """Polymorphic shortcut to use in test"""
+        if is_ami:
+            return verify_command(f"sudo supervisorctl status")
+        else:
+            return verify_command(f"docker exec {pmm_server_docker_container} supervisorctl status")
 
 
     # leaving sys.argv[0] alone
