@@ -28,7 +28,7 @@ if __name__ == '__main__':
             listResponse = verify_command(f"docker exec {container} pmm-admin list")
             for line in listResponse.split("Port")[1].strip().splitlines():
                 if "pmm_agent" in line:
-                    if "connected e" not in line.lower():
+                    if "connected" not in line.lower():
                         errors.append(f"pmm_agent status in container {container} should be 'Connected' but is: {line}")
                 else:
                     if "running" not in line.lower():
