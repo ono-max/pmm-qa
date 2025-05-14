@@ -26,7 +26,7 @@ if __name__ == '__main__':
     services = ['ps_', 'mysql_', 'pxc_', 'pgsql_', 'rs10', 'haproxy_', 'external_']
 
     for container in containerNames.splitlines():
-        if "ps_" in container or "mysql_" in container or "pxc_" in container or "pgsql_" in container or "rs10" in container or "haproxy_" in container:
+        if "ps_" in container or "mysql_" in container or "pxc_" in container or "pgsql_" in container or "rs10" in container:
             listResponse = verify_command(f"docker exec {container} pmm-admin list")
             for line in listResponse.split("Port")[1].strip().splitlines():
                 if "pmm_agent" in line:
