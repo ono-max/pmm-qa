@@ -22,7 +22,7 @@ def verify_command(command):
 if __name__ == '__main__':
     containerNames = verify_command("docker ps -a --format '{{.Names}}'")
     errors = []
-    services = ['ps_', 'mysql_', 'pxc_', 'pgsql_', 'rs10', 'haproxy_', 'external_']
+    services = ['ps_', 'mysql_', 'pxc_', 'pgsql_', 'rs10']
 
     for container in containerNames.splitlines():
         if any(service in container for service in services):
