@@ -218,6 +218,7 @@ jobs:
             echo "VM_BOX=bento/ubuntu-24.04" >> $GITHUB_ENV
           fi
           if [[ "${{ inputs.os }}" =~ "ol-9" ]]; then
+            echo "DOCKER_TAG=oraclelinux:9" >> $GITHUB_ENV
             echo "VM_BOX=generic/oracle9" >> $GITHUB_ENV
           fi
           if [[ "${{ inputs.os }}" =~ "al2023" ]]; then
@@ -257,6 +258,7 @@ jobs:
         run: |
           cat > test_runner.sh <<'EOF'
             #!/usr/bin/env bash
+            set -euo pipefail
             if [ -f /etc/os-release ]; then
               . /etc/os-release
             else
@@ -282,12 +284,13 @@ jobs:
             ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
           EOF
       
+          sed -i 's/\r$//' test_runner.sh
           chmod +x test_runner.sh
+
           docker run --rm \
             -v "$PWD:/work" \
             -w /work \
-            -v "$PWD/test_runner.sh:/test.sh" \
-            --entrypoint /test.sh \
+            --entrypoint /work/test_runner.sh \
             rockylinux:9
 
       - uses: actions/upload-artifact@v4
