@@ -274,11 +274,11 @@ jobs:
           is_rhel_like()   { [[ "$distro_id" =~ ^(rhel|centos|rocky|almalinux|fedora|ol|oracle)$ || "$distro_like" == *"rhel"* || "$distro_like" == *"fedora"* ]]; }
 
           if is_debian_like; then
-            apt-get update
-            apt-get install -y apt-transport-https ca-certificates ansible git wget iproute
+            apt-get update  >/dev/null
+            apt-get install -y apt-transport-https ca-certificates ansible git wget iproute  >/dev/null
           elif is_rhel_like; then
             dnf -y update >/dev/null || true
-            dnf -y install git wget ansible-core iproute
+            dnf -y install git wget ansible-core iproute  >/dev/null
           fi
           
           cat >/usr/local/bin/sudo <<'SH'
@@ -293,8 +293,6 @@ jobs:
           sed -i 's/\r$//' test_runner.sh
           chmod +x test_runner.sh
           
-          cat test_runner.sh
-
           docker run --rm \
             -v "$PWD:/work" \
             -w /work \
