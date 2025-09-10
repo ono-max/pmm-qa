@@ -260,7 +260,7 @@ jobs:
         run: |
           timeout 240 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://127.0.0.1/v1/readyz)" != "200" ]]; do sleep 2; done' || false
 
-      - name: "Run (${{ contains(env.TARBALL, 'PR-') ? 'feature build' : inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
+      - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         env:
           PLAYBOOK: ${{ inputs.playbook }}
         run: |
