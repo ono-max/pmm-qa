@@ -286,6 +286,8 @@ jobs:
       
           sed -i 's/\r$//' test_runner.sh
           chmod +x test_runner.sh
+          
+          cat test_runner.sh
 
           docker run --rm \
             -v "$PWD:/work" \
