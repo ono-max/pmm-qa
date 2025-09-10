@@ -261,8 +261,6 @@ jobs:
           timeout 240 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://127.0.0.1/v1/readyz)" != "200" ]]; do sleep 2; done' || false
 
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
-        env:
-          PLAYBOOK: ${{ inputs.playbook }}
         run: |
           cat > test_runner.sh <<'EOF'
             #!/usr/bin/env bash
@@ -288,7 +286,7 @@ jobs:
               dnf -y install git wget ansible-core || dnf -y install git wget ansible
             fi
 
-            ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${PLAYBOOK}.yml"
+            ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
           EOF
       
           chmod +x test_runner.sh
