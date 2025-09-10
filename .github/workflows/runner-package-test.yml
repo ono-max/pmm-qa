@@ -286,8 +286,6 @@ jobs:
           exec "$@"
           SH
           chmod +x /usr/local/bin/sudo
-          export install_package=${{ inputs.package }}
-          export test_repo=${{ env.REPO }}
 
           ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
           EOF
@@ -300,6 +298,8 @@ jobs:
           docker run --rm \
             -v "$PWD:/work" \
             -w /work \
+            -e install_package=${{ inputs.package }} \
+            -e test_repo=${{ env.REPO }} \
             --entrypoint /work/test_runner.sh \
             rockylinux:9
 
