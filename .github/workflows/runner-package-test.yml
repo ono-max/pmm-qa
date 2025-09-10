@@ -260,11 +260,12 @@ jobs:
         run: |
           timeout 240 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://127.0.0.1/v1/readyz)" != "200" ]]; do sleep 2; done' || false
 
-      - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
-        working-directory: ./
+      - name: "Run (${{ contains(env.TARBALL, 'PR-') ? 'feature build' : inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
+        env:
+          PLAYBOOK: ${{ inputs.playbook }}
         run: |
           cat > test_runner.sh <<'EOF'
-            #!/bin/bash
+            #!/usr/bin/env bash
             if [ -f /etc/os-release ]; then
               . /etc/os-release
             else
@@ -280,19 +281,21 @@ jobs:
             is_rhel_like()   { [[ "$distro_id" =~ ^(rhel|centos|rocky|almalinux|fedora|ol|oracle)$ || "$distro_like" == *"rhel"* || "$distro_like" == *"fedora"* ]]; }
 
             if is_debian_like; then
-	          apt-get update
+              apt-get update
               apt-get install -y apt-transport-https ca-certificates ansible git wget
             elif is_rhel_like; then
-              dnf update -y > /dev/null
-              dnf install -y git wget ansible-core
+              dnf -y update >/dev/null || true
+              dnf -y install git wget ansible-core || dnf -y install git wget ansible
             fi
 
-            ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 playbooks/${{ env.PLAYBOOK }}.yml
+            ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${PLAYBOOK}.yml"
           EOF
-          
+      
           chmod +x test_runner.sh
           docker run --rm \
-            -v $(pwd)/test.sh:/test.sh \
+            -v "$PWD:/work" \
+            -w /work \
+            -v "$PWD/test_runner.sh:/test.sh" \
             --entrypoint /test.sh \
             rockylinux:9
 
