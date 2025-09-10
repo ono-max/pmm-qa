@@ -275,10 +275,10 @@ jobs:
 
           if is_debian_like; then
             apt-get update
-            apt-get install -y apt-transport-https ca-certificates ansible git wget
+            apt-get install -y apt-transport-https ca-certificates ansible git wget iproute
           elif is_rhel_like; then
             dnf -y update >/dev/null || true
-            dnf -y install git wget ansible-core || dnf -y install git wget ansible
+            dnf -y install git wget ansible-core iproute
           fi
           
           cat >/usr/local/bin/sudo <<'SH'
