@@ -298,6 +298,7 @@ jobs:
             -w /work \
             -e install_package=${{ inputs.package }} \
             -e install_repo=${{ env.REPO }} \
+            -e PMM_SERVER_IP=pmm-server \
             --entrypoint /work/test_runner.sh \
             oraclelinux:9
 
