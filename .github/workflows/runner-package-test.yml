@@ -257,31 +257,31 @@ jobs:
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
           cat > test_runner.sh <<'EOF'
-            #!/usr/bin/env bash
-            set -euo pipefail
-            if [ -f /etc/os-release ]; then
-              . /etc/os-release
-            else
-              echo "Cannot detect distribution (no /etc/os-release)"
-              exit 1
-            fi
+          #!/usr/bin/env bash
+          set -euo pipefail
+          if [ -f /etc/os-release ]; then
+            . /etc/os-release
+          else
+            echo "Cannot detect distribution (no /etc/os-release)"
+            exit 1
+          fi
 
-            distro_id="${ID,,}"
-            distro_like="${ID_LIKE,,}"
-            echo "Detected distribution: ID=${distro_id}  ID_LIKE=${distro_like}"
-            # Helper predicates
-            is_debian_like() { [[ "$distro_id" == "debian" || "$distro_id" == "ubuntu" || "$distro_like" == *"debian"* ]]; }
-            is_rhel_like()   { [[ "$distro_id" =~ ^(rhel|centos|rocky|almalinux|fedora|ol|oracle)$ || "$distro_like" == *"rhel"* || "$distro_like" == *"fedora"* ]]; }
+          distro_id="${ID,,}"
+          distro_like="${ID_LIKE,,}"
+          echo "Detected distribution: ID=${distro_id}  ID_LIKE=${distro_like}"
+          # Helper predicates
+          is_debian_like() { [[ "$distro_id" == "debian" || "$distro_id" == "ubuntu" || "$distro_like" == *"debian"* ]]; }
+          is_rhel_like()   { [[ "$distro_id" =~ ^(rhel|centos|rocky|almalinux|fedora|ol|oracle)$ || "$distro_like" == *"rhel"* || "$distro_like" == *"fedora"* ]]; }
 
-            if is_debian_like; then
-              apt-get update
-              apt-get install -y apt-transport-https ca-certificates ansible git wget
-            elif is_rhel_like; then
-              dnf -y update >/dev/null || true
-              dnf -y install git wget ansible-core || dnf -y install git wget ansible
-            fi
+          if is_debian_like; then
+            apt-get update
+            apt-get install -y apt-transport-https ca-certificates ansible git wget
+          elif is_rhel_like; then
+            dnf -y update >/dev/null || true
+            dnf -y install git wget ansible-core || dnf -y install git wget ansible
+          fi
 
-            ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
+          ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
           EOF
       
           sed -i 's/\r$//' test_runner.sh
