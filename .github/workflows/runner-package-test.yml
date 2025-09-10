@@ -280,6 +280,12 @@ jobs:
             dnf -y update >/dev/null || true
             dnf -y install git wget ansible-core || dnf -y install git wget ansible
           fi
+          
+          cat >/usr/local/bin/sudo <<'SH'
+          #!/bin/sh
+          exec "$@"
+          SH
+          chmod +x /usr/local/bin/sudo
 
           ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
           EOF
