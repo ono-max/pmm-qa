@@ -294,12 +294,19 @@ jobs:
           chmod +x test_runner.sh
           
           docker run --rm \
+            --network="pmm-network" \
             -v "$PWD:/work" \
             -w /work \
             -e install_package=${{ inputs.package }} \
             -e install_repo=${{ env.REPO }} \
             -e PMM_SERVER_IP=pmm-server \
+            -e IS_DOCKER=true \
+            -e PMM_VERSION=3.4.0 \
+            -u 0 \
+            --cgroupns=host \
+            -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
             --entrypoint /work/test_runner.sh \
+            --name pmm-client \
             oraclelinux:9
 
       - uses: actions/upload-artifact@v4
