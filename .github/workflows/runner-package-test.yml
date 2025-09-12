@@ -277,6 +277,7 @@ jobs:
             apt-get update  >/dev/null
             apt-get install -y apt-transport-https ca-certificates ansible git wget iproute  >/dev/null
           elif is_rhel_like; then
+            dnf install -y epel-release >/dev/null || true
             dnf -y update >/dev/null || true
             dnf -y install git wget ansible-core iproute  >/dev/null
           fi
