@@ -309,7 +309,7 @@ jobs:
             -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
             -v /tmp/$(mktemp -d):/run \
             --name pmm-client \
-            ${{ env.DOCKER_TAG }}
+            ${{ env.DOCKER_TAG }} \
             /usr/sbin/init
           
           docker exec pmm-client /work/test_runner.sh
