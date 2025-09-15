@@ -218,7 +218,7 @@ jobs:
             echo "VM_BOX=bento/ubuntu-24.04" >> $GITHUB_ENV
           fi
           if [[ "${{ inputs.os }}" =~ "ol-9" ]]; then
-            echo "DOCKER_TAG=oraclelinux:9" >> $GITHUB_ENV
+            echo "DOCKER_TAG=antmelekhin/docker-systemd:almalinux-9" >> $GITHUB_ENV
             echo "VM_BOX=generic/oracle9" >> $GITHUB_ENV
           fi
           if [[ "${{ inputs.os }}" =~ "al2023" ]]; then
@@ -279,7 +279,7 @@ jobs:
           elif is_rhel_like; then
             dnf install -y epel-release >/dev/null || true
             dnf -y update >/dev/null || true
-            dnf -y install git wget ansible-core iproute  >/dev/null
+            dnf -y install git wget ansible-core iproute gflags >/dev/null
           fi
           
           cat >/usr/local/bin/sudo <<'SH'
@@ -293,22 +293,26 @@ jobs:
       
           sed -i 's/\r$//' test_runner.sh
           chmod +x test_runner.sh
-          
-          docker run --rm \
+          docker run -d --rm \
+            --privileged \
             --network="pmm-network" \
             -v "$PWD:/work" \
             -w /work \
-            -e install_package=${{ inputs.package }} \
-            -e install_repo=${{ env.REPO }} \
+            -e install_package=pmm3-client \
+            -e install_repo=testing \
             -e PMM_SERVER_IP=pmm-server \
             -e IS_DOCKER=true \
             -e PMM_VERSION=3.4.0 \
             -u 0 \
             --cgroupns=host \
             -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
-            --entrypoint /work/test_runner.sh \
+            -v /tmp/$(mktemp -d):/run \
             --name pmm-client \
-            oraclelinux:9
+            ${{ env.DOCKER_TAG }}
+            /usr/sbin/init
+          
+          docker exec pmm-client /work/test_runner.sh
+
 
       - uses: actions/upload-artifact@v4
         if: ${{ failure() }}
