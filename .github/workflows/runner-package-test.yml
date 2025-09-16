@@ -267,8 +267,6 @@ jobs:
 
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
-          docker ps -a
-          docker logs pmm-server
           cat > test_runner.sh <<'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
@@ -311,8 +309,8 @@ jobs:
             --network="pmm-network" \
             -v "$PWD:/work" \
             -w /work \
-            -e install_package=pmm3-client \
-            -e install_repo=testing \
+            -e install_package=${{ inputs.package }} \
+            -e install_repo=${{ env.REPO }} \
             -e PMM_SERVER_IP=pmm-server \
             -e IS_DOCKER=true \
             -e PMM_VERSION=3.4.0 \
