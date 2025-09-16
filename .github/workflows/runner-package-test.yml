@@ -180,7 +180,6 @@ jobs:
           fi
           echo "${{ env.PMM_SERVER_IMAGE }}"
           
-          ### pmm2-client repository ### 
           if [[ "${{ inputs.repository }}" = "dev-latest" ]]; then
             echo "REPO=experimental" >> $GITHUB_ENV
           fi
@@ -199,7 +198,6 @@ jobs:
                     
           echo "repo=${{ env.REPO }}"
           
-          ### vagrant vm ###
           if [[ "${{ inputs.os }}" =~ "bullseye" ]]; then
             echo "VM_BOX=generic/debian11" >> $GITHUB_ENV
           fi
@@ -225,29 +223,11 @@ jobs:
           if [[ "${{ inputs.os }}" =~ "al2023" ]]; then
             echo "VM_BOX=gbailey/al2023" >> $GITHUB_ENV
           fi
-          echo "${{ env.VM_BOX }}"
-          
-          ### test name -> playbook map ###
-          # basic         -> pmm2-client.yml
-          # basic upgrade -> pmm2-client_upgrade.yml
-          # basic tarball -> pmm2-client_custom_path.yml
-          
-          # config password          -> pmm2-client_integration_auth_config.yml
-          # register password        -> pmm2-client_integration_auth_register.yml
-          # tarball setup password   -> pmm2-client_integration_auth_setup.yml
-          # tarball path             -> pmm2-client_integration_custom_path.yml
-          # tarball port             -> pmm2-client_integration_custom_port.yml
-          # integration upgrade port -> pmm2-client_integration_upgrade_custom_port.yml
-          
-          ######### Matrix tests
-          # integration          -> pmm2-client_integration.yml
-          # integration upgrade  -> pmm2-client_integration_upgrade.yml
-          # tarball upgrade path -> pmm2-client_integration_upgrade_custom_path.yml
-
 
       - name: 'Setup "${{ env.PMM_SERVER_IMAGE }}"'
         run: |
           docker network create pmm-network
+          sudo docker volume create pmm-volume
           docker run --detach --restart always \
           --network="pmm-network" \
           -e PMM_DEBUG=1 \
@@ -268,8 +248,7 @@ jobs:
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
           cat > test_runner.sh <<'EOF'
-          #!/usr/bin/env bash
-          set -euo pipefail
+          #!/bin/bash
           if [ -f /etc/os-release ]; then
             . /etc/os-release
           else
@@ -285,24 +264,23 @@ jobs:
           is_rhel_like()   { [[ "$distro_id" =~ ^(rhel|centos|rocky|almalinux|fedora|ol|oracle)$ || "$distro_like" == *"rhel"* || "$distro_like" == *"fedora"* ]]; }
 
           if is_debian_like; then
-            apt-get update  >/dev/null
-            apt-get install -y apt-transport-https ca-certificates ansible git wget iproute  >/dev/null
+            apt-get update
+            apt-get install -y apt-transport-https ca-certificates ansible git wget iproute2
           elif is_rhel_like; then
-            dnf install -y epel-release >/dev/null || true
-            dnf -y update >/dev/null || true
-            dnf -y install git wget ansible-core iproute gflags >/dev/null
+            dnf install -y epel-release
+            dnf update -y
+            dnf install -y git wget ansible-core iproute gflags
           fi
-          
+
           cat >/usr/local/bin/sudo <<'SH'
           #!/bin/sh
           exec "$@"
           SH
           chmod +x /usr/local/bin/sudo
 
-          ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 "playbooks/${{ inputs.playbook }}.yml"
+          ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --limit 127.0.0.1 playbooks/${{ inputs.playbook }}.yml
           EOF
       
-          sed -i 's/\r$//' test_runner.sh
           chmod +x test_runner.sh
           docker run -d --rm \
             --privileged \
