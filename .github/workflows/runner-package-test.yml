@@ -60,7 +60,7 @@ on:
       os:
         description: "Select OS to run test in:"
         required: true
-        default: "jammy"
+        default: "ol-9"
         type: choice
         options:
           - bullseye
