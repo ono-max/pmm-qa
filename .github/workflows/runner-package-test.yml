@@ -226,6 +226,8 @@ jobs:
 
       - name: 'Setup "${{ env.PMM_SERVER_IMAGE }}"'
         run: |
+          apt-get update
+          apt-get install --only-upgrade docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
           docker network create pmm-network
           sudo docker volume create pmm-volume
           docker run --detach --restart always \
