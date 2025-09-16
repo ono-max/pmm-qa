@@ -314,7 +314,6 @@ jobs:
             -e PMM_SERVER_IP=pmm-server \
             -e IS_DOCKER=true \
             -e PMM_VERSION=3.4.0 \
-            -u 0 \
             --cgroupns=host \
             -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
             -v /tmp/$(mktemp -d):/run \
