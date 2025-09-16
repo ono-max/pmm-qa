@@ -258,6 +258,7 @@ jobs:
 
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
+          sleep 60
           docker ps -a
           docker logs pmm-server
           cat > test_runner.sh <<'EOF'
