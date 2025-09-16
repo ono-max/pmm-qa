@@ -247,6 +247,7 @@ jobs:
 
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
+          docker -v
           cat > test_runner.sh <<'EOF'
           #!/bin/bash
           if [ -f /etc/os-release ]; then
