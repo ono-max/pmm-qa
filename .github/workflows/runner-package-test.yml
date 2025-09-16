@@ -313,7 +313,7 @@ jobs:
             -e install_repo=${{ env.REPO }} \
             -e PMM_SERVER_IP=pmm-server \
             -e IS_DOCKER=true \
-            -e PMM_VERSION=3.4.0 \
+            -e PMM_VERSION=${{ inputs.expected_version }} \
             --cgroupns=host \
             -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
             -v /tmp/$(mktemp -d):/run \
