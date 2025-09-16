@@ -134,6 +134,7 @@ jobs:
       PLAYBOOK: ${{ inputs.playbook }}
       VERBOSE: "no"
 
+
     steps:
       - name: "Create status check"
         if: ${{ env.SHA != 'null' }}
@@ -257,6 +258,8 @@ jobs:
 
       - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
         run: |
+          docker ps -a
+          docker logs pmm-server
           cat > test_runner.sh <<'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
