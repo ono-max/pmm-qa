@@ -318,6 +318,11 @@ jobs:
           
           docker exec pmm-client /work/test_runner.sh
 
+      - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
+        if: ${{ failure() }}
+        run: |
+          docker ps -a
+          docker logs pmm-server
 
       - uses: actions/upload-artifact@v4
         if: ${{ failure() }}
