@@ -326,12 +326,6 @@ jobs:
           
           docker exec pmm-client /work/test_runner.sh
 
-      - name: "Run (${{ contains(env.TARBALL, 'PR-') && 'feature build' || inputs.repository }})${{ inputs.playbook }} test on ${{ inputs.os }}"
-        if: ${{ failure() }}
-        run: |
-          docker ps -a
-          docker logs pmm-server
-
       - uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
@@ -351,7 +345,3 @@ jobs:
           repository: ${{ github.repository }}
           target_url: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           sha: ${{ env.SHA }}
-
-      #- name: Setup tmate session  on failure
-      #  if: ${{ failure() }}
-      #  uses: percona/gh-action-action-tmate@v2
