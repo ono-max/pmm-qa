@@ -60,11 +60,12 @@ on:
       os:
         description: "Select OS to run test in:"
         required: true
-        default: "ol-9"
+        default: "trixie"
         type: choice
         options:
           - bullseye
           - bookworm
+          - trixie
           - noble
           - jammy
           - focal
@@ -119,7 +120,7 @@ on:
 jobs:
   test:
     name: ${{ inputs.test_name || inputs.playbook}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       SHA: ${{ inputs.sha || 'null' }}
@@ -223,6 +224,10 @@ jobs:
           fi
           if [[ "${{ inputs.os }}" =~ "al2023" ]]; then
             echo "VM_BOX=gbailey/al2023" >> $GITHUB_ENV
+          fi
+          if [[ "${{ inputs.os }}" =~ "trixie" ]]; then
+            echo "DOCKER_TAG=antmelekhin/docker-systemd:debian-13" >> $GITHUB_ENV
+            echo "VM_BOX=bento/ubuntu-24.04" >> $GITHUB_ENV
           fi
 
       - name: 'Setup "${{ env.PMM_SERVER_IMAGE }}"'
